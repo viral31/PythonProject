@@ -1,11 +1,12 @@
-# Use official Python image
-FROM python:3.11-slim
+# Use AWS Lambda Python base image
+FROM public.ecr.aws/lambda/python:3.11
 
-# Create non-root user
-RUN useradd -m -u 1000 appuser
+# Copy Lambda Web Adapter
+COPY --from=public.ecr.aws/awsguru/aws-lambda-adapter:0.7.0 /lambda-adapter /opt/extensions/lambda-adapter
 
-# Set working directory
-WORKDIR /app
+# Set environment variables
+ENV AWS_LWA_INVOKE_MODE=RESPONSE_STREAM
+ENV AWS_LWA_PORT=8000
 
 # Copy requirements and install dependencies
 COPY requirements.txt .
@@ -13,13 +14,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy source code
 COPY ./app ./app
-
-# Change ownership to non-root user
-RUN chown -R appuser:appuser /app
-USER appuser
-
-# Expose port
-EXPOSE 8000
 
 # Start the FastAPI app
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
