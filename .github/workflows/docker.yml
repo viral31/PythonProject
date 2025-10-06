@@ -1,0 +1,25 @@
+name: Build Docker Image
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Build Docker image
+        run: docker build -t fastapi-app .
+        
+      - name: Save Docker image
+        run: docker save fastapi-app > fastapi-app.tar
+        
+      - name: Upload Docker image artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: fastapi-docker-image
+          path: fastapi-app.tar
