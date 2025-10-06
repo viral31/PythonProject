@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException
-from app.schemas.product import Product
+from schemas.product import Product
 from typing import List
 
 router = APIRouter()
