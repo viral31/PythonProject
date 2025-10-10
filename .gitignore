@@ -9,6 +9,22 @@ venv/
 .venv/
 .env
 
+# Byte-compiled / cached files
+__pycache__/
+**/__pycache__/
+*.pyc
+
+# Pytest cache
+.pytest_cache/
+
+# Mypy
+.mypy_cache/
+
+# Distribution/build
+build/
+dist/
+*.egg-info/
+
 # IDE
 .vscode/
 .idea/

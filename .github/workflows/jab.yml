@@ -1,0 +1,49 @@
+name: Secure CI Pipeline
+
+on: [push, pull_request]
+
+jobs:
+  secure-ci:
+    runs-on: ubuntu-latest
+    env:
+     
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      IMAGE_NAME: myapp:latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Build Docker image (for container scanning)
+        if: github.event_name != 'pull_request' && inputs.build != 'false'
+        run: |
+          docker build -t $IMAGE_NAME .
+
+      - name: Run SonarQube Analysis
+        uses: sonarsource/sonarqube-scan-action@v2
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: python
+
+
+
+      - name: Run CodeQL analysis
+        uses: github/codeql-action/analyze@v3
+
+      - name: Container Scan (Trivy)
+        uses: aquasecurity/trivy-action@v0.17.2
+        with:
+          image-ref: ${{ env.IMAGE_NAME }}
