@@ -35,7 +35,7 @@ jobs:
           SONAR_HOST_URL: https://sonarcloud.io
 
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@v2
+        uses: github/codeql-action/init@v3
         with:
           languages: python
 
